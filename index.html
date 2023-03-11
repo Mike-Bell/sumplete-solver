@@ -7,7 +7,9 @@
       <div id="input-grid"></div>
       <br/>
       <button id="solve">Solve</button>
-      <button id="input-example">Input Example</button>
+      <button id="example-3">Solve 3x3 example</button>
+      <button id="example-4">Solve 4x4 example</button>
+      <button id="example-5">Solve 5x5 example</button>
       <br/>
       <div id="solution"></div>
    </body>
@@ -29,7 +31,9 @@
 
    <script>
       const sizeInput = document.getElementById('size');
-      const exampleButton = document.getElementById('input-example');
+      const example3Button = document.getElementById('example-3');
+      const example4Button = document.getElementById('example-4');
+      const example5Button = document.getElementById('example-5');
       const solveButton = document.getElementById('solve');
       const solutionDisplay = document.getElementById('solution');
 
@@ -223,6 +227,8 @@
 
       sizeInput.onchange = createInputGrid;
       solveButton.onclick = solve;
-      exampleButton.onclick = doExample3;
+      example3Button.onclick = doExample3;
+      example4Button.onclick = doExample4;
+      example5Button.onclick = doExample5;
    </script>
 </html>
