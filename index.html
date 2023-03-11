@@ -10,6 +10,7 @@
       <button id="example-3">Solve 3x3 example</button>
       <button id="example-4">Solve 4x4 example</button>
       <button id="example-5">Solve 5x5 example</button>
+      <button id="example-6">Solve 6x6 example</button>
       <br/>
       <div id="solution"></div>
    </body>
@@ -34,6 +35,7 @@
       const example3Button = document.getElementById('example-3');
       const example4Button = document.getElementById('example-4');
       const example5Button = document.getElementById('example-5');
+      const example6Button = document.getElementById('example-6');
       const solveButton = document.getElementById('solve');
       const solutionDisplay = document.getElementById('solution');
 
@@ -82,9 +84,9 @@
          let initialState = grid.map(row => row.map(v => true));
          let solution = null;
 
-         const states = [initialState];
+         const states = [[initialState, 0, 0]];
          while (states.length > 0) {
-            const state = states.pop();
+            const [state, stateR, stateC] = states.pop();
             let stateRowSums = [];
             let stateColumnSums = [];
 
@@ -121,14 +123,14 @@
                break;
             }
 
-            for (let r = 0; r < size; r++) {
-               for (let c = 0; c < size; c++) {
+            for (let r = stateR; r < size; r++) {
+               for (let c = (r > stateR ? 0 : stateC); c < size; c++) {
                   if (state[r][c]
                      && stateRowSums[r] - grid[r][c] >= rowSums[r]
                      && stateColumnSums[c] - grid[r][c] >= columnSums[c]) {
                      const nextState = state.map(row => row.map(v => v));
                      nextState[r][c] = false;
-                     states.push(nextState);
+                     states.push([nextState, r, c]);
                   }
                }
             }
@@ -148,80 +150,70 @@
          console.timeEnd('solve');
       };
 
-      const doExample3 = () => {
-         sizeInput.value = 3;
+      const doExample = (rowSums, colSums, vals) => {
+         sizeInput.value = rowSums.length;
          createInputGrid();
-         [1, 0, 5].forEach((rowSum, r) => {
+         rowSums.forEach((rowSum, r) => {
             rowSumElements[r].value = rowSum;
          });
 
-         [1, 0, 5].forEach((columnSum, c) => {
+         colSums.forEach((columnSum, c) => {
             columnSumElements[c].value = columnSum;
          });
 
-         [
-            [1, 7, 4],
-            [4, 6, 8],
-            [2, 6, 5]
-         ].forEach((row, r) => {
+         vals.forEach((row, r) => {
             row.forEach((val, c) => {
                inputElements[r][c].value = val;
             });
          });
-
          solve();
       };
 
-      const doExample4 = () => {
-         sizeInput.value = 4;
-         createInputGrid();
-         [1, 0, 0, 17].forEach((rowSum, r) => {
-            rowSumElements[r].value = rowSum;
-         });
+      const doExample3 = () => doExample(
+         [1, 0, 5],
+         [1, 0, 5],
+         [
+            [1, 7, 4],
+            [4, 6, 8],
+            [2, 6, 5]
+         ]
+      );
 
-         [7, 10, 0, 1].forEach((columnSum, c) => {
-            columnSumElements[c].value = columnSum;
-         });
-
+      const doExample4 = () => doExample(
+         [1, 0, 0, 17],
+         [7, 10, 0, 1],
          [
             [2, 1, 9, 7],
             [4, 8, 7, 3],
             [1, 9, 2, 5],
             [7, 9, 1, 1]
-         ].forEach((row, r) => {
-            row.forEach((val, c) => {
-               inputElements[r][c].value = val;
-            });
-         });
+         ]
+      );
 
-         solve();
-      }
-
-      const doExample5 = () => {
-         sizeInput.value = 5;
-         createInputGrid();
-         [26, 8, 13, 7, 9].forEach((rowSum, r) => {
-            rowSumElements[r].value = rowSum;
-         });
-
-         [4, 20, 17, 10, 12].forEach((columnSum, c) => {
-            columnSumElements[c].value = columnSum;
-         });
-
+      const doExample5 = () => doExample(
+         [26, 8, 13, 7, 9],
+         [4, 20, 17, 10, 12],
          [
             [7, 2, 9, 7, 8],
             [5, 8, 4, 3, 3],
             [4, 9, 7, 2, 4],
             [2, 6, 5, 3, 4],
             [4, 1, 8, 1, 1]
-         ].forEach((row, r) => {
-            row.forEach((val, c) => {
-               inputElements[r][c].value = val;
-            });
-         });
+         ]
+      );
 
-         solve();
-      };
+      const doExample6 = () => doExample(
+         [21, 13, 4, 14, 24, 14],
+         [15, 11, 20, 20, 17, 7],
+         [
+            [8, 7, 7, 7, 7, 9],
+            [7, 4, 6, 1, 6, 8],
+            [1, 2, 6, 1, 3, 5],
+            [3, 3, 3, 6, 2, 9],
+            [9, 6, 2, 6, 6, 6],
+            [4, 7, 7, 6, 2, 1]
+         ]
+      );
 
       createInputGrid();
 
@@ -230,5 +222,6 @@
       example3Button.onclick = doExample3;
       example4Button.onclick = doExample4;
       example5Button.onclick = doExample5;
+      example6Button.onclick = doExample6;
    </script>
 </html>
