@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+   <body>
+      <span>Size:</span>
+      <input type="number" id="size" value="3" max="8" min="3"/>
+      <br/>
+      <div id="input-grid"></div>
+      <br/>
+      <button id="solve">Solve</button>
+      <button id="input-example">Input Example</button>
+      <br/>
+      <div id="solution"></div>
+   </body>
+
+   <style>
+      .grid-element {
+         width: 30px;
+         height: 30px;
+      }
+
+      .grid-element.row-sum {
+         margin-left: 10px;
+      }
+
+      .grid-element.column-sum {
+         margin-top: 10px;
+      }
+   </style>
+
+   <script>
+      const sizeInput = document.getElementById('size');
+      const exampleButton = document.getElementById('input-example');
+      const solveButton = document.getElementById('solve');
+      const solutionDisplay = document.getElementById('solution');
+
+      let inputElements = [];
+      let rowSumElements = [];
+      let columnSumElements = [];
+      const createInputGrid = () => {
+         inputElements = [];
+         rowSumElements = [];
+         columnSumElements = [];
+         const size = sizeInput.value;
+         const inputGrid = document.getElementById('input-grid');
+         inputGrid.innerHTML = '';
+         for (let r = 0; r < size; r++) {
+            inputElements.push([]);
+            for (let c = 0; c < size; c++) {
+               const inp = document.createElement('input');
+               inp.setAttribute('type', 'number');
+               inp.classList = 'grid-element';
+               inputGrid.appendChild(inp);
+               inputElements[r].push(inp);
+            }
+            const inp = document.createElement('input');
+            inp.setAttribute('type', 'number');
+            inp.classList = 'grid-element row-sum';
+            inputGrid.appendChild(inp);
+            rowSumElements.push(inp);
+            inputGrid.appendChild(document.createElement('br'));
+         }
+
+         for (let c = 0; c < size; c++) {
+            const inp = document.createElement('input');
+            inp.setAttribute('type', 'number');
+            inp.classList = 'grid-element column-sum';
+            inputGrid.appendChild(inp);
+            columnSumElements.push(inp);
+         }
+      };
+
+      const solve = () => {
+         console.time('solve');
+         const grid = inputElements.map(row => row.map(e => +e.value));
+         const rowSums = rowSumElements.map(e => +e.value);
+         const size = rowSums.length;
+         const columnSums = columnSumElements.map(e => +e.value);
+         let initialState = grid.map(row => row.map(v => true));
+         let solution = null;
+
+         const states = [initialState];
+         while (states.length > 0) {
+            const state = states.pop();
+            let stateRowSums = [];
+            let stateColumnSums = [];
+
+            for (let r = 0; r < size; r++) {
+               let sum = 0;
+               for (let c = 0; c < size; c++) {
+                  if (state[r][c]) {
+                     sum += grid[r][c];
+                  }
+               }
+               stateRowSums[r] = sum;
+            }
+
+            for (let c = 0; c < size; c++) {
+               let sum = 0;
+               for (let r = 0; r < size; r++) {
+                  if (state[r][c]) {
+                     sum += grid[r][c];
+                  }
+               }
+               stateColumnSums[c] = sum;
+            }
+
+            let isSolution = true;
+            for (let i = 0; i < size; i++) {
+               if (isSolution && (stateRowSums[i] !== rowSums[i] || stateColumnSums[i] !== columnSums[i])) {
+                  isSolution = false;
+                  break;
+               }
+            }
+
+            if (isSolution) {
+               solution = state;
+               break;
+            }
+
+            for (let r = 0; r < size; r++) {
+               for (let c = 0; c < size; c++) {
+                  if (state[r][c]
+                     && stateRowSums[r] - grid[r][c] >= rowSums[r]
+                     && stateColumnSums[c] - grid[r][c] >= columnSums[c]) {
+                     const nextState = state.map(row => row.map(v => v));
+                     nextState[r][c] = false;
+                     states.push(nextState);
+                  }
+               }
+            }
+         }
+
+         solutionDisplay.innerHTML = '';
+         for (let r = 0; r < size; r++) {
+            for (let c = 0; c < size; c++) {
+               const ele = document.createElement('span');
+               const isOn = solution[r][c];
+               ele.innerText = isOn ? 'O' : 'X';
+               ele.style.color = isOn ? 'green' : 'red';
+               solutionDisplay.appendChild(ele);
+            }
+            solutionDisplay.appendChild(document.createElement('br'));
+         }
+         console.timeEnd('solve');
+      };
+
+      const doExample3 = () => {
+         sizeInput.value = 3;
+         createInputGrid();
+         [1, 0, 5].forEach((rowSum, r) => {
+            rowSumElements[r].value = rowSum;
+         });
+
+         [1, 0, 5].forEach((columnSum, c) => {
+            columnSumElements[c].value = columnSum;
+         });
+
+         [
+            [1, 7, 4],
+            [4, 6, 8],
+            [2, 6, 5]
+         ].forEach((row, r) => {
+            row.forEach((val, c) => {
+               inputElements[r][c].value = val;
+            });
+         });
+
+         solve();
+      };
+
+      const doExample4 = () => {
+         sizeInput.value = 4;
+         createInputGrid();
+         [1, 0, 0, 17].forEach((rowSum, r) => {
+            rowSumElements[r].value = rowSum;
+         });
+
+         [7, 10, 0, 1].forEach((columnSum, c) => {
+            columnSumElements[c].value = columnSum;
+         });
+
+         [
+            [2, 1, 9, 7],
+            [4, 8, 7, 3],
+            [1, 9, 2, 5],
+            [7, 9, 1, 1]
+         ].forEach((row, r) => {
+            row.forEach((val, c) => {
+               inputElements[r][c].value = val;
+            });
+         });
+
+         solve();
+      }
+
+      const doExample5 = () => {
+         sizeInput.value = 5;
+         createInputGrid();
+         [26, 8, 13, 7, 9].forEach((rowSum, r) => {
+            rowSumElements[r].value = rowSum;
+         });
+
+         [4, 20, 17, 10, 12].forEach((columnSum, c) => {
+            columnSumElements[c].value = columnSum;
+         });
+
+         [
+            [7, 2, 9, 7, 8],
+            [5, 8, 4, 3, 3],
+            [4, 9, 7, 2, 4],
+            [2, 6, 5, 3, 4],
+            [4, 1, 8, 1, 1]
+         ].forEach((row, r) => {
+            row.forEach((val, c) => {
+               inputElements[r][c].value = val;
+            });
+         });
+
+         solve();
+      };
+
+      createInputGrid();
+
+      sizeInput.onchange = createInputGrid;
+      solveButton.onclick = solve;
+      exampleButton.onclick = doExample3;
+   </script>
+</html>
